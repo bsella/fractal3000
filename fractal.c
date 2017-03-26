@@ -15,7 +15,7 @@ int width=1080, height=720;//3508 2480
 float unit=300;
 
 int it=100, max=30, d=0;
-int *mandel;
+int **mandel;
 
 complex double center, c;
 
@@ -99,25 +99,25 @@ void novaretti(SDL_Surface *screen, int x1, int y1, int x2, int y2){
 					pixels[x+y*width]=color(screen,fabs(sum));
 		}
 	}
-	SDL_Flip(screen);
 }
 
 void load(int x1, int y1, int x2, int y2, SDL_Surface *screen){
 	//novaretti(screen, x1, y1, x2, y2);
 	int x,y;
-	//Uint32 *pixels= screen->pixels;
 	for (y=y1;y<y2;y++){
 		for (x=x1;x<x2;x++){
 			//pixels[x+y*width]=SDL_MapRGB(screen->format,0,0,0);
 			complex double p=conv(x,y);
 			//c=p;//mandelbrot
-			//SDL_Surface* im;
-			mandel[x+y*width]=it;
+			SDL_Surface* im=image;
+			mandel[0][x+y*width]=it;
 			for (int i=0;i<it;i++){
 				p=p*p+c;
 				if(cabs(p)>40){
-					mandel[x+y*width]=i;
-					//pixels[x+y*width]=color(screen,i);
+					mandel[0][x+y*width]=i;
+					int w=im->w, h=im->h;
+					mandel[1][x+y*width]=(carg(p)+3.141593)/6.283186*w;
+					mandel[2][x+y*width]=2*h-log(cabs(p))*(h/3.6895016);
 					break;
 				}
 				// if(cabs(p)>10){
@@ -134,17 +134,30 @@ void load(int x1, int y1, int x2, int y2, SDL_Surface *screen){
 	}
 }
 
+int mode=0;
+
 void show(SDL_Surface *s){
 	Uint32 *pixels= s->pixels;
-	for(int i=0;i<width*height;i++)
-		pixels[i]=mandel[i]==it? SDL_MapRGB(s->format,0,0,0):color(s,mandel[i]);
+	switch(mode){
+		case 0:
+			for(int i=0;i<width*height;i++)
+				pixels[i]=mandel[0][i]==it? SDL_MapRGB(s->format,0,0,0):color(s,mandel[0][i]);
+		break;
+		case 1:
+			for(int i=0;i<width*height;i++)
+				pixels[i]=mandel[0][i]==it? SDL_MapRGB(s->format,0,0,0):get_pixel32(image,mandel[1][i]+mandel[2][i]*image->w);
+		break;
+	}
 	SDL_Flip(s);
 }
 
 void decale(SDL_Surface *screen, int dx, int dy){
 	for(int y=dy<0?0:height-1; (dy<0&&y<height+dy)||(dy>=0&&y>=dy); y=dy<0?y+1:y-1)
-		for(int x=dx<0?width-1:0; (dx<0&&x>=-dx)||(dx>=0&&x<width-dx); x=dx<0?x-1:x+1)
-			mandel[x+y*width]=mandel[x+dx+(y-dy)*width];
+		for(int x=dx<0?width-1:0; (dx<0&&x>=-dx)||(dx>=0&&x<width-dx); x=dx<0?x-1:x+1){
+			mandel[0][x+y*width]=mandel[0][x+dx+(y-dy)*width];
+			mandel[1][x+y*width]=mandel[1][x+dx+(y-dy)*width];
+			mandel[2][x+y*width]=mandel[2][x+dx+(y-dy)*width];
+		}
 	center+=dx/unit + dy/unit*I;
 	dx<0?load(0, 0,-dx,height,screen):load(width-dx, 0, width,height,screen);
 	dy<0?load(0, height+dy,width,height,screen):load(0, 0, width,dy,screen);
@@ -172,18 +185,28 @@ void *run(void* screen){
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	SDL_Surface *screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
-	image= SDL_LoadBMP("lol.bmp");
+	image= SDL_LoadBMP("elinfinity.bmp");
 	image=SDL_ConvertSurface(image,screen->format,0);
 	//i2= SDL_LoadBMP("flying.bmp");
 	//i2=SDL_ConvertSurface(i2,screen->format,0);
 	//i3= SDL_LoadBMP("poke.bmp");
 	//i3=SDL_ConvertSurface(i3,screen->format,0);
-	mandel=malloc(width*height*sizeof(int));
+	mandel=malloc(3*sizeof(int*));
+	mandel[0]=malloc(width*height*sizeof(int));//iterations
+	mandel[1]=malloc(width*height*sizeof(int));//x
+	mandel[2]=malloc(width*height*sizeof(int));//y
 	SDL_Joystick *joystick;
 	if(SDL_NumJoysticks()){
 		printf("%s\n", SDL_JoystickName(0));
 		SDL_JoystickEventState(SDL_ENABLE);
 		joystick=SDL_JoystickOpen(0);
+		pthread_mutex_init(&mutex,NULL);
+		pthread_mutex_lock(&mutex);
+		pthread_t ptid;
+		if(pthread_create(&ptid, NULL, &run, screen)!=0){
+			perror("error creating thread");
+			return 1;
+		}
 	}
 	center=0;
 	c=-.835 -.2321*I;
@@ -191,15 +214,8 @@ int main(int argc, char* argv[]){
 	//c=-.2+.5*I;
 	//c=-.61+.02*I;
 	load(0,0,width,height,screen);
-	pthread_mutex_init(&mutex,NULL);
-	pthread_mutex_lock(&mutex);
-	pthread_t ptid;
-	if(pthread_create(&ptid, NULL, &run, screen)!=0){
-		perror("error creating thread");
-		return 1;
-	}
-	int stil=1;
-	while(stil){
+	int stop=0;
+	while(!stop){
 		SDL_Event event;
 		SDL_WaitEvent(&event);
 		int reload=1;
@@ -228,7 +244,6 @@ int main(int argc, char* argv[]){
 					case SDL_HAT_LEFTUP: decale(screen,-20,20); break;
 					default:break;
 				}
-				show(screen);
 				break;
 			case SDL_JOYBUTTONDOWN:
 				switch(event.jbutton.button){
@@ -246,13 +261,12 @@ int main(int argc, char* argv[]){
 				}
 				if(reload)
 					load(0,0,width,height,screen);
-				show(screen);
 				break;
 			case SDL_KEYDOWN:
 				switch(event.key.keysym.sym){
 					case SDLK_q: unit/=1.05;break;
 					case SDLK_w: unit*=1.05;break;
-					case SDLK_p: if(max!=6) max-=6;reload=0;break;
+					case SDLK_p: if(max!=6)max-=6;reload=0;break;
 					case SDLK_o: max+=6;reload=0;break;
 					case SDLK_l: c+=.01;break;
 					case SDLK_j: c-=.01;break;
@@ -260,23 +274,24 @@ int main(int argc, char* argv[]){
 					case SDLK_k: c-=.01*I;break;
 					case SDLK_MINUS: if(d)d--;reload=0;break;
 					case SDLK_EQUALS: d++;reload=0;break;
-					case SDLK_ESCAPE: terminate(screen,c); stil=0;break;
 					case SDLK_DOWN: decale(screen,0,-20);reload=0; break;
 					case SDLK_LEFT: decale(screen,-20,0);reload=0; break;
 					case SDLK_RIGHT: decale(screen,20,0);reload=0; break;
-					case SDLK_UP: decale(screen,0,20);
+					case SDLK_UP: decale(screen,0,20);reload=0; break;
+					case SDLK_RETURN: mode= mode==1?0:mode+1;reload=0;break;
+					case SDLK_ESCAPE: terminate(screen,c); stop=1;break;
 					default:reload=0;break;
 				}
 				if(reload)
 					load(0,0,width,height,screen);
-				show(screen);
 				break;
 			case SDL_QUIT:
 				terminate(screen,c);
-				stil=0;
+				stop=1;
 				break;
 			default: break;
 		}
+		show(screen);
 	}
 	SDL_FreeSurface(screen);
 	free(mandel);
