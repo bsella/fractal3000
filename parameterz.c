@@ -1,10 +1,9 @@
 #include "parameterz.h"
 #include <math.h>
 
-float unit=300;
+double unit=300;
 
 int it=100, max=30, d=0;
-int **mandel;
 
 complex double center=0,
 c=-.835 -.2321*I;
@@ -14,15 +13,22 @@ c=-.835 -.2321*I;
 int mode=0;
 int dx=0, dy=0;
 
+complex double conv(int x, int y){
+	return creal(center)+(x-width/2)/unit + (cimag(center)-(y-height/2)/unit)*I;
+}
+
 void maxUP(){
-	max+=6;
+	if(mode==0)
+		max+=6;
 }
 
 void maxDOWN(){
-	if(max!=6)max-=6;
+	if(mode==0)
+		if(max!=6)max-=6;
 }
 void dUP(){
-	d++;
+	if(mode==0)
+		d++;
 }
 void dDOWN(){
 	if(d)d--;
@@ -45,7 +51,7 @@ void cRIGHT(){
 }
 
 void nextMode(){
-	mode= mode==1?0:mode+1;
+	mode= mode==2?0:mode+1;
 }
 
 void setDX(int x){

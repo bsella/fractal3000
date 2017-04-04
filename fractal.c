@@ -46,13 +46,16 @@ void terminate(SDL_Surface *s, complex double c){
 	SDL_SaveBMP(s, "output/test.bmp");
 }
 
+SDL_Surface **images;
+
+pthread_mutex_t mutex;
 void *run(void* screen){
-	show(screen);
+	show(screen,images);
 	while(1){
 		pthread_mutex_lock(&mutex);
 		while(dx!=0||dy!=0){
 			decale((SDL_Surface*)screen,dx/500,-dy/500);
-			show(screen);
+			show(screen,images);
 		}
 	}
 	return NULL;
@@ -63,14 +66,17 @@ int width=1080, height=720;//3508 2480
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	SDL_Surface *screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
-	image= SDL_LoadBMP("elinfinity.bmp");
-	image=SDL_ConvertSurface(image,screen->format,0);
+	images=malloc(2*sizeof(SDL_Surface*));
+	images[0]=SDL_LoadBMP("tigre.bmp");
+	images[0]=SDL_ConvertSurface(images[0],screen->format,0);
+	images[1]= SDL_LoadBMP("elinfinity.bmp");
+	images[1]=SDL_ConvertSurface(images[1],screen->format,0); 
 	
 	
-	mandel=malloc(3*sizeof(int*));
-	mandel[0]=malloc(width*height*sizeof(int));//iterations
-	mandel[1]=malloc(width*height*sizeof(int));//x
-	mandel[2]=malloc(width*height*sizeof(int));//y
+	mandel=malloc(width*height*sizeof(int));//iterations
+	freyman=malloc(2*sizeof(double*));
+	freyman[0]=malloc(width*height*sizeof(double));//x
+	freyman[1]=malloc(width*height*sizeof(double));//y
 	SDL_Joystick *joystick;
 	if(SDL_NumJoysticks()){
 		printf("%s\n", SDL_JoystickName(0));
@@ -78,9 +84,9 @@ int main(int argc, char* argv[]){
 		joystick=SDL_JoystickOpen(0);
 	}
 	
-	load(0,0,width,height,screen);
+	load(0,0,width,height);
 	int stop=0;
-	show(screen);
+	show(screen, images);
 	pthread_mutex_init(&mutex,NULL);
 	pthread_mutex_lock(&mutex);
 	pthread_t ptid;
@@ -117,7 +123,7 @@ int main(int argc, char* argv[]){
 					case SDL_HAT_LEFTUP: decale(screen,-20,20); break;
 					default:break;
 				}
-				show(screen);
+				show(screen,images);
 				break;
 			case SDL_JOYBUTTONDOWN:
 				switch(event.jbutton.button){
@@ -134,8 +140,8 @@ int main(int argc, char* argv[]){
 					default:reload=0; break;
 				}
 				if(reload)
-					load(0,0,width,height,screen);
-				show(screen);
+					load(0,0,width,height);
+				show(screen,images);
 				break;
 			case SDL_KEYDOWN:
 				switch(event.key.keysym.sym){
@@ -158,8 +164,8 @@ int main(int argc, char* argv[]){
 					default:reload=0;break;
 				}
 				if(reload)
-					load(0,0,width,height,screen);
-				show(screen);
+					load(0,0,width,height);
+				show(screen,images);
 				break;
 			case SDL_QUIT:
 				terminate(screen,c);
@@ -169,10 +175,13 @@ int main(int argc, char* argv[]){
 		}
 	}
 	SDL_FreeSurface(screen);
-	free(mandel[0]);
-	free(mandel[1]);
-	free(mandel[2]);
+	SDL_FreeSurface(images[0]);
+	SDL_FreeSurface(images[1]);
+	free(images);
 	free(mandel);
+	free(freyman[0]);
+	free(freyman[1]);
+	free(freyman);
 	SDL_Quit();
 	printf("it vorks!\n");
 	return 0;

@@ -3,20 +3,18 @@
 #include <complex.h>
 #include <SDL/SDL.h>
 
-extern int width, height;//3508 2480
+int width, height;//3508 2480
 
-extern float unit;
+double unit;
 
-extern int it, max, d;
-int **mandel;
+int it, max, d;
 
-extern complex double center, c;
+complex double center, c;
 
-SDL_Surface* image;
+int mode;
+int dx, dy;
 
-extern int mode;
-pthread_mutex_t mutex;
-extern int dx, dy;
+complex double conv(int x, int y);
 
 void maxUP();
 void maxDOWN();
