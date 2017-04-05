@@ -3,6 +3,7 @@ OPT=`sdl-config --cflags --libs` -lm
 
 all: main.o showfractal.o loadfractal.o parameterz.o
 	$(CC) main.o parameterz.o showfractal.o loadfractal.o $(OPT) -o fractalTest
+	make clean
 wall:
 	$(CC) wall.c $(OPT) -o fractalTest
 	

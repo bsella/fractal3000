@@ -3,7 +3,7 @@
 
 double unit=300;
 
-int it=100, max=30, d=0;
+int max=30, d=0;
 
 complex double center=0,
 c=-.835 -.2321*I;
@@ -12,6 +12,7 @@ c=-.835 -.2321*I;
 //c=-.61+.02*I;
 int mode=0;
 int dx=0, dy=0;
+double bailout = 40;
 
 complex double conv(int x, int y){
 	return creal(center)+(x-width/2)/unit + (cimag(center)-(y-height/2)/unit)*I;
@@ -68,4 +69,13 @@ void unitUP(){
 
 void unitDOWN(){
 	unit/=1.05;
+}
+
+void bailoutUP(){
+	bailout*=1.05;
+}
+
+void bailoutDOWN(){
+	if(bailout>3)
+		bailout/=1.5;
 }

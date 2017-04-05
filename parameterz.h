@@ -5,9 +5,9 @@
 
 int width, height;//3508 2480
 
-double unit;
+double unit, bailout;
 
-int it, max, d;
+int max, d;
 
 complex double center, c;
 
@@ -33,7 +33,9 @@ void setDX(int x);
 void setDY(int y);
 
 void unitUP();
-
 void unitDOWN();
+
+void bailoutUP();
+void bailoutDOWN();
 
 #endif

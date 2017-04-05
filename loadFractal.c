@@ -3,6 +3,8 @@
 #include <complex.h>
 #include <math.h>
 
+int maxIt=100;
+
 static complex double nextIteration(complex double z){
 	return z*z+c;
 }
@@ -12,16 +14,15 @@ void load(int x1, int y1, int x2, int y2){
 	int x,y;
 	for (y=y1;y<y2;y++){
 		for (x=x1;x<x2;x++){
-			//pixels[x+y*width]=SDL_MapRGB(screen->format,0,0,0);
 			complex double p=conv(x,y);
 			//c=p;//mandelbrot
-			mandel[x+y*width]=it;
-			for (int i=0;i<it;i++){
+			mandel[x+y*width]=0;
+			for (int i=0;i<maxIt;i++){
 				p=nextIteration(p);
-				if(cabs(p)>40){
+				if(cabs(p)>bailout){
 					mandel[x+y*width]=i;
-					freyman[0][x+y*width]=(carg(p)+3.141593)/6.283186;
-					freyman[1][x+y*width]=2-log(cabs(p))/3.68950177;
+					freyman[0][x+y*width]=-(carg(p)+3.141593)/6.283186+2;
+					freyman[1][x+y*width]=log(bailout*bailout/cabs(p))/log(bailout);//2-log(cabs(p))/3.68950177;
 					break;
 				}
 			}

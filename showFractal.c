@@ -46,7 +46,7 @@ Uint32 color(SDL_Surface *screen, int i){
 }
 
 Uint32 grayscale(SDL_Surface *screen, int i){
-	return SDL_MapRGB(screen->format,255-i*255/it,255-i*255/it,255-i*255/it);
+	return SDL_MapRGB(screen->format,255-i*255/max,255-i*255/max,255-i*255/max);
 }
 
 void show(SDL_Surface *s, SDL_Surface **images){
@@ -54,11 +54,11 @@ void show(SDL_Surface *s, SDL_Surface **images){
 	switch(mode){
 		case 0:
 			for(int i=0;i<width*height;i++)
-				pixels[i]=mandel[i]==it? SDL_MapRGB(s->format,0,0,0):color(s,mandel[i]);
+				pixels[i]=mandel[i]==0? SDL_MapRGB(s->format,0,0,0):color(s,mandel[i]);
 		break;
 		default:
 			for(int i=0;i<width*height;i++)
-				pixels[i]=mandel[i]==it? SDL_MapRGB(s->format,0,0,0):get_pixel32(images[mode-1],(int)(freyman[0][i]*images[mode-1]->w) +(int)(freyman[1][i]*images[mode-1]->h)*images[mode-1]->w);
+				pixels[i]=mandel[i]==0? SDL_MapRGB(s->format,0,0,0):get_pixel32(images[mode-1],(int)(freyman[0][i]*images[mode-1]->w) +(int)(freyman[1][i]*images[mode-1]->h)*images[mode-1]->w);
 	}
 	SDL_Flip(s);
 }
