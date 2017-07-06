@@ -1,20 +1,19 @@
 CC=gcc
-OPT=`sdl-config --cflags --libs` -lm
+CCFLAGS=-Wall
+LDFLAGS=`sdl-config --cflags --libs` -lm
+objects= main.o palette.o fractal.o parameterz.o input.o
+EXE= eliFractal
 
-all: main.o showfractal.o loadfractal.o parameterz.o
-	$(CC) main.o parameterz.o showfractal.o loadfractal.o $(OPT) -o fractalTest
-	make clean
+all: $(EXE)
+
 wall:
 	$(CC) wall.c $(OPT) -o fractalTest
-	
-showfractal.o:
-	$(CC) -c showfractal.c -o showfractal.o
-loadfractal.o:
-	$(CC) -c loadfractal.c -o loadfractal.o
-parameterz.o:
-	$(CC) -c parameterz.c -o parameterz.o
-main.o:
-	$(CC) -c fractal.c -o main.o
+
+%.o: %.c
+	$(CC) $(CCFLAGS) -c $< -o $@
+
+$(EXE): $(objects)
+	$(CC) $(LDFLAGS) $(objects) -o $@
 
 clean:
 	rm -f *.o

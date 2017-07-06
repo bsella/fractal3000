@@ -12,10 +12,10 @@ c=-.835 -.2321*I;
 //c=-.61+.02*I;
 int mode=0;
 int dx=0, dy=0;
-double bailout = 40;
+double bailout = 50;
 
 complex double conv(int x, int y){
-	return creal(center)+(x-width/2)/unit + (cimag(center)-(y-height/2)/unit)*I;
+	return creal(center)+((double)x-width/2)/unit + (cimag(center)-((double)y-height/2)/unit)*I;
 }
 
 void maxUP(){
