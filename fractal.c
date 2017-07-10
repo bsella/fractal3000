@@ -16,7 +16,7 @@ void load(int x1, int y1, int x2, int y2){
 	for (y=y1;y<y2;y++){
 		for (x=x1;x<x2;x++){
 			complex double p=conv(x,y);
-			c=p;//mandelbrot
+			//c=p;//mandelbrot
 			mandel[x+y*width]=0;
 			for (int i=0;i<maxIt;i++){
 				p=nextIteration(p);
@@ -52,7 +52,11 @@ void show(SDL_Surface *s, SDL_Surface **images){
 		break;
 		default:
 			for(int i=0;i<width*height;i++)
-				pixels[i]=mandel[i]==0? SDL_MapRGB(s->format,0,0,0):get_pixel32(images[mode-1],(int)(freyman[0][i]*images[mode-1]->w) +(int)(freyman[1][i]*images[mode-1]->h)*images[mode-1]->w);
+				pixels[i]=mandel[i]==0? SDL_MapRGB(s->format,0,0,0):
+			get_pixel32(images[mode-1],
+				(int)(freyman[0][i]*images[mode-1]->w)
+				+(int)(freyman[1][i]*images[mode-1]->h-1)*images[mode-1]->w
+			); //x+(y-1)*width //-1 prevents a weird black line on top of every layer
 	}
 	SDL_Flip(s);
 }

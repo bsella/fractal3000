@@ -97,11 +97,12 @@ void loop(){
 				}
 				show(screen,images);
 				break;
-			case SDL_MOUSEBUTTONDOWN:
-				bailoutUP();
-				load(0,0,width,height);
-				show(screen,images);
+			case SDL_MOUSEBUTTONDOWN:{
+				int mouseX, mouseY;
+				SDL_GetMouseState(&mouseX,&mouseY);
+				printf("(%d,%d) (%f,%f)\n", mouseX, mouseY,freyman[0][mouseX+mouseY*width],freyman[1][mouseX+mouseY*width]);
 			break;
+			}
 			case SDL_QUIT:
 				terminate(screen,c);
 				run=0;

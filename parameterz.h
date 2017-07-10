@@ -3,7 +3,7 @@
 #include <complex.h>
 #include <SDL/SDL.h>
 
-unsigned int width, height;//3508 2480
+const unsigned int width, height;//3508 2480
 
 double unit, bailout;
 

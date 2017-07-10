@@ -38,13 +38,13 @@
 // 	}
 // }
 
-unsigned int width=1080, height=720;//3508 2480
+const unsigned int width=1080, height=720;//3508 2480
 
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
 	images=malloc(2*sizeof(SDL_Surface*));
-	images[0]=SDL_LoadBMP("tigre.bmp");
+	images[0]=SDL_LoadBMP("Freyman/output.bmp");
 	images[0]=SDL_ConvertSurface(images[0],screen->format,0);
 	images[1]= SDL_LoadBMP("elinfinity.bmp");
 	images[1]=SDL_ConvertSurface(images[1],screen->format,0); 
