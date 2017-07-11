@@ -16,4 +16,4 @@ $(EXE): $(objects)
 	$(CC) $(LDFLAGS) $(objects) -o $@
 
 clean:
-	rm -f *.o
+	rm -f *.o $(EXE)

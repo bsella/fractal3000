@@ -9,9 +9,9 @@
 
 void terminate(SDL_Surface *s, complex double c){
 	printf("%f %f\n", creal(c), cimag(c));
-	if(!opendir("output"))
-		mkdir("output",700);
-	SDL_SaveBMP(s, "output/test.bmp");
+	if(!opendir("../output"))
+		mkdir("../output",700);
+	SDL_SaveBMP(s, "../output/test.bmp");
 }
 
 void *run(void* screen){
