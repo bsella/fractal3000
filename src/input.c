@@ -1,4 +1,4 @@
-#include <SDL/SDl.h>
+#include <SDL/SDL.h>
 #include <pthread.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -8,10 +8,12 @@
 #include "fractal.h"
 
 void terminate(SDL_Surface *s, complex double c){
-	printf("%f %f\n", creal(c), cimag(c));
-	if(!opendir("../output"))
-		mkdir("../output",700);
-	SDL_SaveBMP(s, "../output/test.bmp");
+	printf("c= %f %f\n", creal(c), cimag(c));
+	printf("unit= %f\n", unit);
+	printf("center= %f %f\n", creal(center), cimag(center));
+	if(!opendir("./output"))
+		mkdir("./output",700);
+	SDL_SaveBMP(s, "./output/test.bmp");
 }
 
 void *run(void* screen){
@@ -28,8 +30,8 @@ void *run(void* screen){
 
 void loop(){
 	int run=1;
+	SDL_Event event;
 	while(run){
-		SDL_Event event;
 		SDL_WaitEvent(&event);
 		switch(event.type){
 			case SDL_JOYAXISMOTION:
@@ -60,8 +62,7 @@ void loop(){
 				break;
 			case SDL_JOYBUTTONDOWN:
 				switch(event.jbutton.button){
-					case 0:
-						cDOWN(); load(0,0,width,height); break;
+					case 0: cDOWN(); load(0,0,width,height); break;
 					case 1: cLEFT(); load(0,0,width,height); break;
 					case 2: cRIGHT(); load(0,0,width,height); break;
 					case 3: cUP(); load(0,0,width,height); break;
@@ -101,7 +102,7 @@ void loop(){
 				int mouseX, mouseY;
 				SDL_GetMouseState(&mouseX,&mouseY);
 				printf("(%d,%d) (%f,%f)\n", mouseX, mouseY,freyman[0][mouseX+mouseY*width],freyman[1][mouseX+mouseY*width]);
-			break;
+				break;
 			}
 			case SDL_QUIT:
 				terminate(screen,c);

@@ -7,10 +7,7 @@
 #include "fractal.h"
 #include "input.h"
 
-/*Pour "fractaliser" une image :
-	//a=(carg(pp)+3.141593)/6.283186*w,
-	//r=(h-log(cabs(pp))*(h/7.37790032);//3.6895016
-*/
+#define IMGDIR "inputImages"
 
 // void novaretti(SDL_Surface *screen, int x1, int y1, int x2, int y2){
 // 	int x,y;
@@ -38,29 +35,32 @@
 // 	}
 // }
 
-const unsigned int width=1080, height=720;//3508 2480
+const unsigned int width=1024, height=768;//3508 2480
 
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
 	images=malloc(2*sizeof(SDL_Surface*));
-	images[0]=SDL_LoadBMP("../freymanTest.bmp");
+	images[0]=SDL_LoadBMP(IMGDIR"/elinfinity.bmp");
 	images[0]=SDL_ConvertSurface(images[0],screen->format,0);
-	images[1]= SDL_LoadBMP("../elinfinity.bmp");
-	images[1]=SDL_ConvertSurface(images[1],screen->format,0); 
+	images[1]= SDL_LoadBMP(IMGDIR"/tigre.bmp");
+	images[1]=SDL_ConvertSurface(images[1],screen->format,0);
+
+	colors=pltInit();
+	pltAdd(colors,SDL_MapRGB(screen->format,255,0,0),0.0);
+	pltAdd(colors,SDL_MapRGB(screen->format,0,255,0),.5);
+	pltAdd(colors,SDL_MapRGB(screen->format,0,0,255),1);
 	
-	
-	mandel=malloc(width*height*sizeof(int));//iterations
+	counts=malloc(width*height*sizeof(int));//iterations
 	freyman=malloc(2*sizeof(double*));
 	freyman[0]=malloc(width*height*sizeof(double));//x
 	freyman[1]=malloc(width*height*sizeof(double));//y
-	SDL_Joystick *joystick;
+	/*SDL_Joystick *joystick;
 	if(SDL_NumJoysticks()){
 		printf("%s\n", SDL_JoystickName(0));
 		SDL_JoystickEventState(SDL_ENABLE);
 		joystick=SDL_JoystickOpen(0);
-	}
-	
+	}*/
 	load(0,0,width,height);
 	show(screen, images);
 	pthread_mutex_init(&mutex,NULL);
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]){
 	SDL_FreeSurface(images[0]);
 	SDL_FreeSurface(images[1]);
 	free(images);
-	free(mandel);
+	free(counts);
 	free(freyman[0]);
 	free(freyman[1]);
 	free(freyman);

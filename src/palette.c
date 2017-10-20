@@ -1,50 +1,90 @@
 #include "palette.h"
-#include "parameterz.h"
 
-Uint32 get_pixel32(SDL_Surface *surface, int i){
-	Uint32 *pixels = (Uint32 *)surface->pixels;
-	return pixels[i];
+/*Uint32 = [........][..RED...][.GREEN..][..BLUE..]*/
+
+struct paletteColor{
+	Uint32 clr;
+	double index;
+	struct paletteColor *next;
+};
+
+static void getRGB(Uint32 color, Uint8*r, Uint8*g, Uint8*b){
+	*b=color;
+	color>>=8;
+	*g=color;
+	color>>=8;
+	*r=color;
 }
 
-Uint32 color(SDL_Surface *screen, int i){
-	int r,g,b;
-	i=i+d;
-	int m6= max/6;
-	double id=(double)(i%m6)/(double)m6;
-	switch((i%max/m6)){
-		case 0:
-			r=255;
-			g=id*255;
-			b=0;
-		break;
-		case 1:
-			r=(1-id)*255;
-			g=255;
-			b=0;
-		break;
-		case 2:
-			r=0;
-			g=255;
-			b=id*255;
-		break;
-		case 3:
-			r=0;
-			g=(1-id)*255;
-			b=255;
-		break;
-		case 4:
-			r=id*255;
-			g=0;
-			b=255;
-		break;
-		case 5 :
-			r=255;
-			g=0;
-			b=(1-id)*255;
+static Uint32 makeRGB(Uint8 r, Uint8 g, Uint8 b){
+	Uint32 c=r;
+	c<<=8; c|=g;
+	c<<=8; c|=b;
+	return c;
+}
+
+Palette* pltInit(){
+	Palette* plt=malloc(sizeof(Palette));
+	plt->first=NULL;
+	return plt;
+}
+
+int pltEmpty(Palette plt){
+	return plt.first==NULL;
+}
+
+void pltAdd(Palette *p, Uint32 color, double i){
+	if(i<0)i=0;
+	if(i>1)i=1;
+	struct paletteColor *new=malloc(sizeof(struct paletteColor));
+	new->clr=color;
+	new->index=i;
+	new->next=NULL;
+	if(pltEmpty(*p))
+		p->first=new;
+	else{
+		if(p->first->index>i){
+			new->next=p->first;
+			p->first=new;
+		}else{
+			struct paletteColor *it=p->first;
+			while(it->next!=NULL && it->next->index<i)
+				it=it->next;
+			new->next=it->next;
+			it->next=new;
+		}
 	}
-	return SDL_MapRGB(screen->format,r,g,b);
 }
 
-Uint32 grayscale(SDL_Surface *screen, int i){
-	return SDL_MapRGB(screen->format,255-i*255/max,255-i*255/max,255-i*255/max);
+static Uint32 average(struct paletteColor c1, struct paletteColor c2, double i){
+	i=(i-c1.index)/(c2.index-c1.index);
+	Uint8 r1,g1,b1, r2,g2,b2;
+	getRGB(c1.clr,&r1,&g1,&b1);
+	getRGB(c2.clr,&r2,&g2,&b2);
+	return makeRGB(r2*i+(1.0-i)*r1
+					,g2*i+(1.0-i)*g1
+					,b2*i+(1.0-i)*b1);
+}
+
+Uint32 pltGet(Palette p, double i){
+	if(pltEmpty(p)) return 0;
+	if(i<0) return p.first->clr;
+	struct paletteColor *it=p.first;
+	while(it->next!=NULL && it->next->index<i)
+		it=it->next;
+	if(it->next==NULL)
+		return it->clr;
+	return average(*it, *(it->next), i);
+}
+
+static void freeFirst(Palette *p){
+	struct paletteColor *f=p->first;
+	p->first=p->first->next;
+	free(f);
+}
+
+void pltFree(Palette *p){
+	while(!pltEmpty(*p))
+		freeFirst(p);
+	free(p);
 }

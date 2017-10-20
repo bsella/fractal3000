@@ -9,8 +9,8 @@ complex double center=0,
 c=-.835 -.2321*I;
 //c=-.23 + .66*I;
 //c=-.2+.5*I;
-//c=-.61+.02*I;
-int mode=0;
+//c=-.61+.02*I;0
+unsigned mode=0;
 int dx=0, dy=0;
 double bailout = 50;
 
