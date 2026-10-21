@@ -11,7 +11,7 @@ void terminate(SDL_Surface *s, complex double c){
 	printf("unit= %f\n", unit);
 	printf("center= %f %f\n", creal(center), cimag(center));
 	if(!opendir("./output"))
-		mkdir("./output",700);
+		mkdir("./output", 0755);
 	SDL_SaveBMP(s, "./output/test.bmp");
 }
 
