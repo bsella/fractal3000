@@ -4,11 +4,7 @@
 #include <sys/stat.h>
 #include "input.h"
 #include "parameterz.h"
-#include "palette.h"
 #include "fractal.h"
-
-SDL_Surface **images;
-SDL_Surface *screen;
 
 void terminate(SDL_Surface *s, complex double c){
 	printf("c= %f %f\n", creal(c), cimag(c));
@@ -19,7 +15,7 @@ void terminate(SDL_Surface *s, complex double c){
 	SDL_SaveBMP(s, "./output/test.bmp");
 }
 
-void loop(){
+void loop(SDL_Surface *screen, SDL_Surface **images){
 	int run=1;
 	SDL_Event event;
 	while(run){

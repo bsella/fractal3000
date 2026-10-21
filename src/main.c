@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <math.h>
 #include <SDL/SDL.h>
 #include <pthread.h>
 #include "parameterz.h"
@@ -35,14 +34,31 @@
 // 	}
 // }
 
-int main(int argc, char* argv[]){
+int num_images;
+
+int main(int argc, char* argv[])
+{
+	SDL_Surface *screen;
+	SDL_Surface **images;
+
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
-	images=malloc(2*sizeof(SDL_Surface*));
-	images[0]=SDL_LoadBMP(IMGDIR"/elinfinity.bmp");
-	images[0]=SDL_ConvertSurface(images[0],screen->format,0);
-	images[1]= SDL_LoadBMP(IMGDIR"/tigre.bmp");
-	images[1]=SDL_ConvertSurface(images[1],screen->format,0);
+
+	num_images = argc - 1;
+	if(num_images > 0)
+	{
+		images = malloc(num_images*sizeof(SDL_Surface*));
+	}
+	else
+	{
+		images = NULL;
+	}
+
+	for(int arg = 0; arg < num_images; arg++)
+	{
+		images[arg]=SDL_LoadBMP(argv[arg + 1]);
+		images[arg]=SDL_ConvertSurface(images[arg],screen->format,0);
+	}
 
 	colors=pltInit();
 	pltAdd(colors,SDL_MapRGB(screen->format,255,0,0),0.0);
@@ -61,16 +77,24 @@ int main(int argc, char* argv[]){
 	}*/
 	load(0,0,width,height);
 	show(screen, images);
-	loop();
-	SDL_FreeSurface(screen);
-	SDL_FreeSurface(images[0]);
-	SDL_FreeSurface(images[1]);
-	free(images);
-	free(counts);
+	loop(screen, images);
 	free(freyman[0]);
 	free(freyman[1]);
 	free(freyman);
+	free(counts);
+
+	if(images != 0)
+	{
+		for(int arg = 0; arg < num_images; arg++)
+		{
+			SDL_FreeSurface(images[arg]);
+		}
+		free(images);
+	}
+	
+	SDL_FreeSurface(screen);
 	SDL_Quit();
+
 	printf("it vorks!\n");
 	return 0;
 }

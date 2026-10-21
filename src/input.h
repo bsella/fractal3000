@@ -2,10 +2,7 @@
 #define INPUT
 #include <SDL/SDL.h>
 
-extern SDL_Surface **images;
-extern SDL_Surface *screen;
-
-void loop();
+void loop(SDL_Surface *screen, SDL_Surface **images);
 
 void *run(void* screen);
 

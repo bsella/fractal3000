@@ -28,7 +28,7 @@ int dx=0, dy=0;
 double bailout = 50;
 
 complex double conv(int x, int y){
-	return creal(center)+((double)x-width/2)/unit + (cimag(center)-((double)y-height/2)/unit)*I;
+	return creal(center)+((double)x-width/2.f)/unit + (cimag(center)-((double)y-height/2.f)/unit)*I;
 }
 
 void maxUP(){
@@ -64,8 +64,13 @@ void cRIGHT(){
 	c-=.05/sqrt(unit);
 }
 
-void nextMode(){
-	mode= mode==2?0:mode+1;
+extern int num_images;
+
+void nextMode()
+{
+	mode++;
+	if(mode >= num_images)
+		mode = 0;
 }
 
 void setDX(int x){

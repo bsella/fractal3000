@@ -49,11 +49,8 @@ void decale(int dx, int dy){
 	dy<0?load(0, height+dy,width,height):load(0, 0, width,dy);
 }
 
-static Uint32 getFreyman(int i, SDL_Surface **images, unsigned imgIndex){
-	return get_pixel32(images[imgIndex],
-				(int)(freyman[0][i]*images[imgIndex]->w)
-				+(int)(freyman[1][i]*images[imgIndex]->h-1)*images[imgIndex]->w
-			); //x+(y-1)*width //-1 prevents a weird black line on top of every layer
+static Uint32 getPixel(int i, SDL_Surface *image){
+	return get_pixel32(image, (int)(freyman[0][i]*image->w) + (int)(freyman[1][i]*image->h-1)*image->w); //x+(y-1)*width //-1 prevents a weird black line on top of every layer
 }
 
 static Uint32 colorMulFloat(SDL_Surface* s, Uint32 color, float f){
@@ -66,6 +63,7 @@ int seuil=7;
 
 void show(SDL_Surface *s, SDL_Surface **images){
 	Uint32 *pixels= s->pixels;
+
 	switch(mode){
 		case 0:
 			for(int i=0;i<width*height;i++)
@@ -74,7 +72,7 @@ void show(SDL_Surface *s, SDL_Surface **images){
 		/*case 2:
 			for(int i=0;i<width*height;i++){
 				Uint8 r,g,b;
-				SDL_GetRGB(getFreyman(i,images,0),images[0]->format,&r,&g,&b);
+				SDL_GetRGB(getPixel(i,images[0]), images[0]->format,&r,&g,&b);
 				pixels[i]=counts[i]==0? SDL_MapRGB(s->format,0,0,0): colorMulFloat(s,get_pixel32(background,i),g/255.0);
 			}
 			break;*/
@@ -84,10 +82,10 @@ void show(SDL_Surface *s, SDL_Surface **images){
 					case 0:
 						pixels[i]=SDL_MapRGB(s->format,0,0,0); break;
 					case 1:
-						pixels[i]=getFreyman(i,images,mode-1); break;
+						pixels[i]=getPixel(i,images[mode-1]); break;
 					default:
 						pixels[i]=colorMulFloat(s,
-							getFreyman(i,images,mode-1),
+							getPixel(i,images[mode-1]),
 							exp((counts[i]-seuil)/-10.0));
 				}
 	}
