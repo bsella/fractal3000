@@ -2,10 +2,8 @@
 #define INPUT
 #include <SDL/SDL.h>
 
-SDL_Surface **images;
-SDL_Surface *screen;
-
-pthread_mutex_t mutex;
+extern SDL_Surface **images;
+extern SDL_Surface *screen;
 
 void loop();
 

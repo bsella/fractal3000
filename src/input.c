@@ -7,6 +7,9 @@
 #include "palette.h"
 #include "fractal.h"
 
+SDL_Surface **images;
+SDL_Surface *screen;
+
 void terminate(SDL_Surface *s, complex double c){
 	printf("c= %f %f\n", creal(c), cimag(c));
 	printf("unit= %f\n", unit);
@@ -14,18 +17,6 @@ void terminate(SDL_Surface *s, complex double c){
 	if(!opendir("./output"))
 		mkdir("./output",700);
 	SDL_SaveBMP(s, "./output/test.bmp");
-}
-
-void *run(void* screen){
-	show(screen,images);
-	while(1){
-		pthread_mutex_lock(&mutex);
-		while(dx!=0||dy!=0){
-			decale(dx/500,-dy/500);
-			show(screen,images);
-		}
-	}
-	return NULL;
 }
 
 void loop(){
@@ -44,7 +35,6 @@ void loop(){
 						break;
 					default:break;
 				}
-				pthread_mutex_unlock(&mutex);
 				break;
 			case SDL_JOYHATMOTION:
 				switch(event.jhat.value){

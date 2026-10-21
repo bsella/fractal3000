@@ -35,8 +35,6 @@
 // 	}
 // }
 
-const unsigned int width=1024, height=768;//3508 2480
-
 int main(int argc, char* argv[]){
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
@@ -63,13 +61,6 @@ int main(int argc, char* argv[]){
 	}*/
 	load(0,0,width,height);
 	show(screen, images);
-	pthread_mutex_init(&mutex,NULL);
-	pthread_mutex_lock(&mutex);
-	pthread_t ptid;
-	if(pthread_create(&ptid, NULL, &run, screen)!=0){
-		perror("error creating thread");
-		return 1;
-	}
 	loop();
 	SDL_FreeSurface(screen);
 	SDL_FreeSurface(images[0]);

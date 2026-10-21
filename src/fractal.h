@@ -2,8 +2,8 @@
 #define LOADFRACTAL
 #include <SDL/SDL.h>
 
-unsigned *counts;
-double **freyman;
+extern unsigned *counts;
+extern double **freyman;
 
 void load(int x1, int y1, int x2, int y2);
 

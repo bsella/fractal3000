@@ -1,6 +1,19 @@
 #include "parameterz.h"
 #include <math.h>
 
+Palette *colors;
+
+const unsigned int width=1024, height=768;//3508 2480
+
+double unit, bailout;
+
+int max, d;
+
+complex double center, c;
+
+unsigned mode;
+int dx, dy;
+
 double unit=300;
 
 int max=30, d=0;

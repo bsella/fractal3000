@@ -4,6 +4,9 @@
 #include <complex.h>
 #include <math.h>
 
+unsigned *counts;
+double **freyman;
+
 int maxIt=50;
 
 static complex double nextIteration(complex double z){

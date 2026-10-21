@@ -4,18 +4,18 @@
 #include "palette.h"
 #include <SDL/SDL.h>
 
-Palette *colors;
+extern Palette *colors;
 
-const unsigned int width, height;//3508 2480
+extern const unsigned int width, height;//3508 2480
 
-double unit, bailout;
+extern double unit, bailout;
 
-int max, d;
+extern int max, d;
 
-complex double center, c;
+extern complex double center, c;
 
-unsigned mode;
-int dx, dy;
+extern unsigned mode;
+extern int dx, dy;
 
 complex double conv(int x, int y);
 
