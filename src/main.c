@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <SDL/SDL.h>
 #include <pthread.h>
@@ -6,7 +7,8 @@
 #include "fractal.h"
 #include "input.h"
 
-#define IMGDIR "inputImages"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 // void novaretti(SDL_Surface *screen, int x1, int y1, int x2, int y2){
 // 	int x,y;
@@ -39,7 +41,11 @@ int num_images;
 int main(int argc, char* argv[])
 {
 	SDL_Surface *screen;
+
+	uint8_t** image_data;
 	SDL_Surface **images;
+
+	//SDL_CreateRGBSurfaceFrom
 
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 	screen=SDL_SetVideoMode(width,height,32,SDL_HWSURFACE);
@@ -47,17 +53,36 @@ int main(int argc, char* argv[])
 	num_images = argc - 1;
 	if(num_images > 0)
 	{
-		images = malloc(num_images*sizeof(SDL_Surface*));
+		images     = malloc(num_images*sizeof(SDL_Surface*));
+		image_data = malloc(num_images*sizeof(float*));
 	}
 	else
 	{
-		images = NULL;
+		images     = NULL;
+		image_data = NULL;
 	}
+
+int req_format = STBI_rgb_alpha;
+	Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	int shift = (req_format == STBI_rgb) ? 8 : 0;
+	rmask = 0xff000000 >> shift;
+	gmask = 0x00ff0000 >> shift;
+	bmask = 0x0000ff00 >> shift;
+	amask = 0x000000ff >> shift;
+#else // little endian, like x86
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = (req_format == STBI_rgb) ? 0 : 0xff000000;
+#endif
 
 	for(int arg = 0; arg < num_images; arg++)
 	{
-		images[arg]=SDL_LoadBMP(argv[arg + 1]);
-		images[arg]=SDL_ConvertSurface(images[arg],screen->format,0);
+		int width, height, num_channels;
+		image_data[arg] = stbi_load(argv[arg + 1], &width, &height, &num_channels, 3);
+		images[arg]     = SDL_CreateRGBSurfaceFrom(image_data[arg], width, height, num_channels * 8, width * num_channels, rmask, gmask, bmask, amask);
+		images[arg]     = SDL_ConvertSurface(images[arg],screen->format,0);
 	}
 
 	colors=pltInit();
@@ -90,6 +115,7 @@ int main(int argc, char* argv[])
 			SDL_FreeSurface(images[arg]);
 		}
 		free(images);
+		free(image_data);
 	}
 	
 	SDL_FreeSurface(screen);

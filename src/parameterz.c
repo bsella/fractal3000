@@ -69,7 +69,7 @@ extern int num_images;
 void nextMode()
 {
 	mode++;
-	if(mode >= num_images)
+	if(mode > num_images)
 		mode = 0;
 }
 
