@@ -80,7 +80,7 @@ int req_format = STBI_rgb_alpha;
 	for(int arg = 0; arg < num_images; arg++)
 	{
 		int width, height, num_channels;
-		image_data[arg] = stbi_load(argv[arg + 1], &width, &height, &num_channels, 3);
+		image_data[arg] = stbi_load(argv[arg + 1], &width, &height, &num_channels, 0);
 		images[arg]     = SDL_CreateRGBSurfaceFrom(image_data[arg], width, height, num_channels * 8, width * num_channels, rmask, gmask, bmask, amask);
 		images[arg]     = SDL_ConvertSurface(images[arg],screen->format,0);
 	}
